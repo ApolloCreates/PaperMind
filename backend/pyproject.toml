@@ -1,0 +1,23 @@
+[project]
+name = "researchai-backend"
+version = "0.1.0"
+description = "ResearchAI Backend"
+requires-python = ">=3.12,<3.13"
+
+dependencies = [
+    "fastapi>=0.116.1",
+    "uvicorn[standard]>=0.35.0",
+    "pydantic-settings>=2.10.1",
+    "python-dotenv>=1.1.1",
+    "loguru>=0.7.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "ruff>=0.12.3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
