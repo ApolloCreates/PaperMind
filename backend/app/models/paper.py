@@ -2,7 +2,15 @@ from datetime import datetime
 from enum import Enum
 from uuid import uuid4
 
-from sqlalchemy import DateTime, Enum as SqlEnum, String
+from sqlalchemy import (
+    DateTime,
+    Enum as SqlEnum,
+    ForeignKey,
+    Integer,
+    JSON,
+    String,
+    Text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -19,21 +27,41 @@ class Paper(Base):
     __tablename__ = "papers"
 
     id: Mapped[str] = mapped_column(
-        String,
+        String(36),
         primary_key=True,
         default=lambda: str(uuid4()),
     )
 
     project_id: Mapped[str] = mapped_column(
-    ForeignKey("projects.id"),
-    nullable=False,
-)
+        ForeignKey("projects.id"),
+        nullable=False,
+    )
 
-    filename: Mapped[str] = mapped_column(String)
+    filename: Mapped[str] = mapped_column(String(255))
 
-    original_filename: Mapped[str] = mapped_column(String)
+    original_filename: Mapped[str] = mapped_column(String(255))
 
-    storage_path: Mapped[str] = mapped_column(String)
+    storage_path: Mapped[str] = mapped_column(String(500))
+
+    title: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+    )
+
+    authors: Mapped[list | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    abstract: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    page_count: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+    )
 
     status: Mapped[PaperStatus] = mapped_column(
         SqlEnum(PaperStatus),

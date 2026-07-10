@@ -5,11 +5,14 @@ from fastapi import FastAPI
 from app.api.v1.router import api_router
 from app.db.base import Base
 from app.db.session import engine
-
+from app.storage.minio import initialize_bucket
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+
+    initialize_bucket()
+
     yield
 
 
