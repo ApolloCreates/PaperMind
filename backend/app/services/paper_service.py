@@ -1,10 +1,10 @@
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
-from app.models.paper import Paper
 from app.repositories.paper_repository import PaperRepository
 from app.storage.minio import MinIOStorage
 from app.services.pdf_service import PDFService
+from app.models.paper import Paper, PaperStatus
 
 
 class PaperService:
@@ -38,8 +38,19 @@ class PaperService:
             original_filename=file.filename,
             storage_path=object_name,
 
-            title=metadata["title"],
-            page_count=metadata["page_count"],
+            title=metadata.get("title"),
+
+            authors=(
+                [author.strip() for author in metadata["authors"].split(",")]
+                if metadata.get("authors")
+                else None
+            ),
+
+            page_count=metadata.get("page_count", 0),
+
+            full_text=metadata.get("text"),
+
+            status=PaperStatus.READY,
         )
 
         return self.repo.create(db, paper)

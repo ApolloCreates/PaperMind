@@ -66,3 +66,16 @@ class PaperRepository:
     ) -> None:
         db.delete(paper)
         db.commit()
+        
+    def get_full_text(
+        self,
+        db: Session,
+        paper_id: str,
+    ) -> str | None:
+
+        paper = self.get(db, paper_id)
+
+        if paper is None:
+            return None
+
+        return paper.full_text

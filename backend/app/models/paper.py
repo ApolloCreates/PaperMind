@@ -78,3 +78,8 @@ class Paper(Base):
         default=datetime.utcnow,
         onupdate=datetime.utcnow,
     )
+    
+    full_text: Mapped[str | None] = mapped_column(
+    Text,
+    nullable=True,
+    )
