@@ -10,11 +10,30 @@ class PaperWriterAgent:
     def generate(
         self,
         context: str,
+        references: list,
         draft_context: str,
         topic: str,
         section: str,
         instructions: str | None,
     ) -> str:
+        
+        reference_text = ""
+
+        for index, reference in enumerate(
+            references,
+            start=1,
+        ):
+
+            authors = reference.get("authors")
+
+            if isinstance(authors, list):
+                authors = ", ".join(authors)
+
+            reference_text += (
+                f"[{index}] {reference['title']}\n"
+                f"Authors: {authors}\n\n"
+            )
+            
 
         user_prompt = f"""
 Research Topic
@@ -36,6 +55,10 @@ Existing Draft
 Research Context
 
 {context}
+
+Retrieved References
+
+{reference_text}
 """
 
         return self.llm.generate(

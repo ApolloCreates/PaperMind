@@ -81,3 +81,50 @@ class RetrievalService:
             context += chunk + "\n\n"
 
         return context.strip()
+    
+    
+    def retrieve_with_references(
+        self,
+        project_id: str,
+        query: str,
+        limit: int = 8,
+    ):
+
+        embedding = self.embedding_service.embed(query)
+
+        results = self.qdrant_service.search_project(
+            embedding=embedding,
+            project_id=project_id,
+            limit=limit,
+        )
+
+        if not results:
+            return {
+                "context": "",
+                "references": [],
+            }
+
+        context = ""
+
+        references = {}
+
+        for point in results:
+
+            payload = point.payload
+
+            context += payload["chunk"] + "\n\n"
+
+            paper_id = payload["paper_id"]
+
+            if paper_id not in references:
+
+                references[paper_id] = {
+                    "paper_id": paper_id,
+                    "title": payload.get("title"),
+                    "authors": payload.get("authors"),
+                }
+
+        return {
+            "context": context.strip(),
+            "references": list(references.values()),
+        }

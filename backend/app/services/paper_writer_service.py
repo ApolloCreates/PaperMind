@@ -59,11 +59,15 @@ class PaperWriterService:
                 f"{item.content}\n\n"
             )
 
-        context = self.retrieval.retrieve_for_project(
+        retrieval = self.retrieval.retrieve_with_references(
             project_id=draft.project_id,
             query=f"{topic} {section.value}",
             limit=8,
         )
+
+        context = retrieval["context"]
+
+        references = retrieval["references"]
 
         if not context:
             raise ValueError(
@@ -72,6 +76,7 @@ class PaperWriterService:
 
         generated = self.agent.generate(
             context=context,
+            references=references,
             draft_context=draft_context,
             topic=topic,
             section=section.value,

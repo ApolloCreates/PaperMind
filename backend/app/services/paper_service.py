@@ -88,7 +88,8 @@ class PaperService:
                         "chunk": chunk,
                         "chunk_index": index,
                         "title": paper.title,
-                    },
+                        "authors": paper.authors,
+                    }
                 )
 
         except Exception as e:

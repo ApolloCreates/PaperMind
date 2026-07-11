@@ -20,4 +20,14 @@ Rules:
 - Do not fabricate experiments or numerical results.
 - Write in formal academic style.
 - Return only the requested section in Markdown.
+
+Whenever you use information from the retrieved papers,
+cite them using [1], [2], etc.
+
+Only cite papers listed in "Retrieved References".
+
+Never invent citations.
+
+At the end of the generated section,
+include a References section listing only the cited papers.
 """

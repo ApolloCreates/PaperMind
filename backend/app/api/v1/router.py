@@ -30,6 +30,10 @@ from app.api.v1.endpoints.drafts import (
     router as draft_router,
 )
 
+from app.api.v1.endpoints.export import (
+    router as export_router,
+)
+
 api_router = APIRouter()
 
 api_router.include_router(project_router)
@@ -58,4 +62,8 @@ api_router.include_router(
 
 api_router.include_router(
     draft_router,
+)
+
+api_router.include_router(
+    export_router,
 )
