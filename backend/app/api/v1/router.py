@@ -26,6 +26,10 @@ from app.api.v1.endpoints.reviewer import (
     router as reviewer_router,
 )
 
+from app.api.v1.endpoints.drafts import (
+    router as draft_router,
+)
+
 api_router = APIRouter()
 
 api_router.include_router(project_router)
@@ -50,4 +54,8 @@ api_router.include_router(
 
 api_router.include_router(
     reviewer_router,
+)
+
+api_router.include_router(
+    draft_router,
 )

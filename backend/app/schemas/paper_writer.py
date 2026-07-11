@@ -1,22 +1,22 @@
 from pydantic import BaseModel
 
-from app.schemas.enums import PaperSection
+from app.models.draft_section import DraftSectionType
 
 
 class PaperWriterRequest(BaseModel):
 
-    project_id: str
+    draft_id: str
 
-    topic: str
-
-    section: PaperSection
+    section: DraftSectionType
 
     instructions: str | None = None
 
 
 class PaperWriterResponse(BaseModel):
 
-    section: str
+    draft_id: str
+
+    section: DraftSectionType
 
     content: str
 

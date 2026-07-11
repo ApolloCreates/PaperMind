@@ -4,6 +4,8 @@ from app.services.qdrant_service import QdrantService
 
 class RetrievalService:
 
+    MAX_CONTEXT = 12000
+
     def __init__(self):
         self.embedding_service = EmbeddingService()
         self.qdrant_service = QdrantService()
@@ -31,10 +33,18 @@ class RetrievalService:
             key=lambda p: p.payload.get("chunk_index", 0),
         )
 
-        return "\n\n".join(
-            point.payload["chunk"]
-            for point in results
-        )
+        context = ""
+
+        for point in results:
+
+            chunk = point.payload["chunk"]
+
+            if len(context) + len(chunk) > self.MAX_CONTEXT:
+                break
+
+            context += chunk + "\n\n"
+
+        return context.strip()
 
     def retrieve_for_project(
         self,
@@ -54,7 +64,10 @@ class RetrievalService:
         if not results:
             return ""
 
-        MAX_CONTEXT = 12000
+        results = sorted(
+            results,
+            key=lambda p: p.payload.get("chunk_index", 0),
+        )
 
         context = ""
 
@@ -62,12 +75,9 @@ class RetrievalService:
 
             chunk = point.payload["chunk"]
 
-            if len(context) + len(chunk) > MAX_CONTEXT:
+            if len(context) + len(chunk) > self.MAX_CONTEXT:
                 break
 
             context += chunk + "\n\n"
 
-        return [
-            point.payload["chunk"]
-            for point in results
-        ]
+        return context.strip()

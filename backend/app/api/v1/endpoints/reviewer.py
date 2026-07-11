@@ -32,8 +32,7 @@ def review(
 
         result = service.review(
             db=db,
-            paper_id=request.paper_id,
-            text=request.text,
+            draft_id=request.draft_id,
         )
 
         return {

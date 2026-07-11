@@ -1,6 +1,7 @@
 from app.llm.llm_service import LLMService
 from app.prompts.paper_writer import SYSTEM_PROMPT
 
+
 class PaperWriterAgent:
 
     def __init__(self):
@@ -9,10 +10,11 @@ class PaperWriterAgent:
     def generate(
         self,
         context: str,
+        draft_context: str,
         topic: str,
         section: str,
         instructions: str | None,
-    ):
+    ) -> str:
 
         user_prompt = f"""
 Research Topic
@@ -26,6 +28,10 @@ Section to Generate
 Additional Instructions
 
 {instructions or "None"}
+
+Existing Draft
+
+{draft_context}
 
 Research Context
 
