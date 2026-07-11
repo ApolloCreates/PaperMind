@@ -79,3 +79,17 @@ class PaperRepository:
             return None
 
         return paper.full_text
+    
+
+    def get_by_ids(
+        self,
+        db: Session,
+        paper_ids: list[str],
+    ) -> list[Paper]:
+
+        stmt = (
+            select(Paper)
+            .where(Paper.id.in_(paper_ids))
+        )
+
+        return db.execute(stmt).scalars().all()
