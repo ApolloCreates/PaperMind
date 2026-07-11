@@ -1,10 +1,13 @@
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
-from app.repositories.paper_repository import PaperRepository
-from app.storage.minio import MinIOStorage
-from app.services.pdf_service import PDFService
 from app.models.paper import Paper, PaperStatus
+from app.repositories.paper_repository import PaperRepository
+from app.services.chunking_service import ChunkingService
+from app.services.embedding_service import EmbeddingService
+from app.services.pdf_service import PDFService
+from app.services.qdrant_service import QdrantService
+from app.storage.minio import MinIOStorage
 
 
 class PaperService:
@@ -12,6 +15,10 @@ class PaperService:
         self.repo = PaperRepository()
         self.storage = MinIOStorage()
         self.pdf_service = PDFService()
+
+        self.chunking_service = ChunkingService()
+        self.embedding_service = EmbeddingService()
+        self.qdrant_service = QdrantService()
 
     async def upload(
         self,
@@ -23,15 +30,19 @@ class PaperService:
         if file.content_type != "application/pdf":
             raise ValueError("Only PDF files are supported.")
 
+        # Read uploaded file
         content = await file.read()
 
+        # Extract metadata and full text
         metadata = self.pdf_service.extract(content)
 
+        # Upload PDF to MinIO
         object_name = self.storage.upload_pdf(
-        file.filename,
-        content,
+            file.filename,
+            content,
         )
 
+        # Create paper object
         paper = Paper(
             project_id=project_id,
             filename=object_name,
@@ -53,7 +64,37 @@ class PaperService:
             status=PaperStatus.READY,
         )
 
-        return self.repo.create(db, paper)
+        # Save paper in PostgreSQL
+        paper = self.repo.create(db, paper)
+
+        # -----------------------------
+        # Chunk -> Embed -> Store Qdrant
+        # -----------------------------
+        try:
+            chunks = self.chunking_service.chunk(
+                paper.full_text or ""
+            )
+
+            embeddings = self.embedding_service.embed_many(chunks)
+
+            for index, (chunk, embedding) in enumerate(
+                zip(chunks, embeddings)
+            ):
+                self.qdrant_service.insert(
+                    embedding=embedding,
+                    payload={
+                        "paper_id": paper.id,
+                        "project_id": project_id,
+                        "chunk": chunk,
+                        "chunk_index": index,
+                        "title": paper.title,
+                    },
+                )
+
+        except Exception as e:
+            print(f"Qdrant ingestion failed: {e}")
+
+        return paper
 
     def list_all(
         self,

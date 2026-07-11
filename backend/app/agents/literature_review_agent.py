@@ -1,46 +1,30 @@
-from litellm import completion
-
-from app.core.config import settings
+from app.llm.llm_service import LLMService
+from app.prompts.literature_review import SYSTEM_PROMPT
 
 
 class LiteratureReviewAgent:
 
-    MODEL = "groq/llama-3.1-8b-instant"
+    def __init__(self):
+        self.llm = LLMService()
 
-    def generate(self, context: str) -> str:
+    def generate(
+        self,
+        context: str,
+        topic: str,
+    ) -> str:
 
-        response = completion(
-            model=self.MODEL,
-            api_key=settings.groq_api_key,
+        user_prompt = f"""
+Research Topic
+
+{topic}
+
+Research Context
+
+{context}
+"""
+
+        return self.llm.generate(
+            system_prompt=SYSTEM_PROMPT,
+            user_prompt=user_prompt,
             temperature=0.3,
-            messages=[
-                {
-                    "role": "system",
-                    "content": """
-You are an experienced research scientist.
-
-Using ONLY the provided papers, write a literature review with the following sections:
-
-# Introduction
-
-# Existing Approaches
-
-# Strengths
-
-# Weaknesses
-
-# Research Trends
-
-# Future Directions
-
-Write in an academic tone.
-""",
-                },
-                {
-                    "role": "user",
-                    "content": context[:25000],
-                },
-            ],
         )
-
-        return response.choices[0].message.content

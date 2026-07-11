@@ -1,6 +1,14 @@
+from uuid import uuid4
+
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance
-from qdrant_client.models import VectorParams
+from qdrant_client.models import (
+    Distance,
+    PointStruct,
+    VectorParams,
+    Filter,
+    FieldCondition,
+    MatchValue
+)
 
 from app.core.config import settings
 
@@ -16,9 +24,9 @@ class QdrantService:
             port=settings.qdrant_port,
         )
 
-        self.create_collection()
+        self._create_collection()
 
-    def create_collection(self):
+    def _create_collection(self):
 
         collections = self.client.get_collections()
 
@@ -37,3 +45,71 @@ class QdrantService:
                 distance=Distance.COSINE,
             ),
         )
+
+    def insert(
+        self,
+        embedding: list[float],
+        payload: dict,
+    ):
+
+        self.client.upsert(
+            collection_name=self.COLLECTION,
+            wait=True,
+            points=[
+                PointStruct(
+                    id=str(uuid4()),
+                    vector=embedding,
+                    payload=payload,
+                )
+            ],
+        )
+
+
+    def search(
+        self,
+        embedding: list[float],
+        paper_id: str,
+        limit: int = 8,
+    ):
+
+        results = self.client.query_points(
+            collection_name=self.COLLECTION,
+            query=embedding,
+            query_filter=Filter(
+                must=[
+                    FieldCondition(
+                        key="paper_id",
+                        match=MatchValue(value=paper_id),
+                    )
+                ]
+            ),
+            limit=limit,
+        )
+
+        return results.points
+    
+    
+    def search_project(
+        self,
+        embedding: list[float],
+        project_id: str,
+        limit: int = 20,
+    ):
+
+        results = self.client.query_points(
+            collection_name=self.COLLECTION,
+            query=embedding,
+            query_filter=Filter(
+                must=[
+                    FieldCondition(
+                        key="project_id",
+                        match=MatchValue(
+                            value=project_id,
+                        ),
+                    )
+                ]
+            ),
+            limit=limit,
+        )
+
+        return results.points

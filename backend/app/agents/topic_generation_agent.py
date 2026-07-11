@@ -1,30 +1,30 @@
 from app.llm.llm_service import LLMService
-from app.prompts.chat import SYSTEM_PROMPT
+from app.prompts.topic_generation import SYSTEM_PROMPT
 
 
-class ChatAgent:
+class TopicGenerationAgent:
 
     def __init__(self):
         self.llm = LLMService()
 
-    def ask(
+    def generate(
         self,
         context: str,
-        question: str,
-    ):
+        research_area: str,
+    ) -> str:
 
         user_prompt = f"""
+Research Area
+
+{research_area}
+
 Research Context
 
 {context}
-
-Question
-
-{question}
 """
 
         return self.llm.generate(
             system_prompt=SYSTEM_PROMPT,
             user_prompt=user_prompt,
-            temperature=0.2,
+            temperature=0.4,
         )

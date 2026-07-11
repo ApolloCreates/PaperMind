@@ -2,7 +2,8 @@ from pydantic import BaseModel
 
 
 class LiteratureReviewRequest(BaseModel):
-    paper_ids: list[str]
+    project_id: str
+    topic: str | None = None
 
 
 class LiteratureReviewResponse(BaseModel):

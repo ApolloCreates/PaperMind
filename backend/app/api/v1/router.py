@@ -14,6 +14,18 @@ from app.api.v1.endpoints.literature_review import (
     router as literature_review_router,
 )
 
+from app.api.v1.endpoints.topic_generation import (
+    router as topic_generation_router,
+)
+
+from app.api.v1.endpoints.paper_writer import (
+    router as paper_writer_router,
+)
+
+from app.api.v1.endpoints.reviewer import (
+    router as reviewer_router,
+)
+
 api_router = APIRouter()
 
 api_router.include_router(project_router)
@@ -27,3 +39,15 @@ api_router.include_router(gap_router)
 api_router.include_router(chat_router)
 
 api_router.include_router(literature_review_router)
+
+api_router.include_router(
+    topic_generation_router,
+)
+
+api_router.include_router(
+    paper_writer_router,
+)
+
+api_router.include_router(
+    reviewer_router,
+)

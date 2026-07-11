@@ -1,15 +1,11 @@
-from fastapi import (
-    APIRouter,
-    File,
-    UploadFile,
-)
+from fastapi import APIRouter, HTTPException
 
-from app.schemas.gap import GapResponse
+from app.schemas.gap import GapRequest, GapResponse
 from app.services.gap_service import GapService
 
 router = APIRouter(
-    prefix="/gap",
-    tags=["Research Gap"],
+    prefix="/gap-detection",
+    tags=["Gap Detection"],
 )
 
 service = GapService()
@@ -19,14 +15,22 @@ service = GapService()
     "",
     response_model=GapResponse,
 )
-async def detect_gap(
-    file: UploadFile = File(...),
-):
+def analyze(request: GapRequest):
 
-    pdf = await file.read()
+    try:
 
-    analysis = service.analyze_pdf(pdf)
+        result = service.analyze(
+            request.project_id,
+            request.topic,
+        )
 
-    return {
-        "analysis": analysis,
-    }
+        return {
+            "gaps": result,
+        }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=404,
+            detail=str(e),
+        )

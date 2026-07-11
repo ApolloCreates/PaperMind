@@ -1,32 +1,31 @@
-from sqlalchemy.orm import Session
-
 from app.agents.literature_review_agent import LiteratureReviewAgent
-from app.repositories.paper_repository import PaperRepository
+from app.services.retrieval_service import RetrievalService
 
 
 class LiteratureReviewService:
 
     def __init__(self):
-        self.repo = PaperRepository()
         self.agent = LiteratureReviewAgent()
+        self.retrieval = RetrievalService()
 
     def generate(
         self,
-        db: Session,
-        paper_ids: list[str],
+        project_id: str,
+        topic: str | None = None,
     ) -> str:
 
-        papers = self.repo.get_by_ids(
-            db,
-            paper_ids,
+        query = topic or "Summarize all uploaded research papers."
+
+        context = self.retrieval.retrieve_for_project(
+            project_id=project_id,
+            query=query,
+            limit=12,
         )
 
-        if not papers:
-            raise ValueError("No papers found.")
+        if not context:
+            raise ValueError("No relevant papers found.")
 
-        context = "\n\n".join(
-            paper.full_text or ""
-            for paper in papers
+        return self.agent.generate(
+            context=context,
+            topic=topic or "General Literature Review",
         )
-
-        return self.agent.generate(context)

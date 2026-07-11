@@ -1,30 +1,25 @@
 from app.llm.llm_service import LLMService
-from app.prompts.gap_detection import SYSTEM_PROMPT
+from app.prompts.reviewer import SYSTEM_PROMPT
 
 
-class GapAgent:
+class ReviewerAgent:
 
     def __init__(self):
         self.llm = LLMService()
 
-    def analyze(
+    def review(
         self,
-        context: str,
-        topic: str,
+        text: str,
     ) -> str:
 
-        user_prompt = f"""
-Research Topic
+        prompt = f"""
+Research Paper
 
-{topic}
-
-Research Context
-
-{context}
+{text[:12000]}
 """
 
         return self.llm.generate(
             system_prompt=SYSTEM_PROMPT,
-            user_prompt=user_prompt,
+            user_prompt=prompt,
             temperature=0.2,
         )

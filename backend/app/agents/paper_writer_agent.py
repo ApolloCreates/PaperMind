@@ -1,22 +1,31 @@
 from app.llm.llm_service import LLMService
-from app.prompts.gap_detection import SYSTEM_PROMPT
+from app.prompts.paper_writer import SYSTEM_PROMPT
 
-
-class GapAgent:
+class PaperWriterAgent:
 
     def __init__(self):
         self.llm = LLMService()
 
-    def analyze(
+    def generate(
         self,
         context: str,
         topic: str,
-    ) -> str:
+        section: str,
+        instructions: str | None,
+    ):
 
         user_prompt = f"""
 Research Topic
 
 {topic}
+
+Section to Generate
+
+{section}
+
+Additional Instructions
+
+{instructions or "None"}
 
 Research Context
 
@@ -26,5 +35,5 @@ Research Context
         return self.llm.generate(
             system_prompt=SYSTEM_PROMPT,
             user_prompt=user_prompt,
-            temperature=0.2,
+            temperature=0.3,
         )

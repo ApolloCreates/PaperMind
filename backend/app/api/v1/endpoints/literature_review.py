@@ -1,7 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException
 
-from app.db.session import get_db
 from app.schemas.literature_review import (
     LiteratureReviewRequest,
     LiteratureReviewResponse,
@@ -20,14 +18,15 @@ service = LiteratureReviewService()
     "",
     response_model=LiteratureReviewResponse,
 )
-def generate_review(
+def generate(
     request: LiteratureReviewRequest,
-    db: Session = Depends(get_db),
 ):
+
     try:
+
         review = service.generate(
-            db,
-            request.paper_ids,
+            request.project_id,
+            request.topic,
         )
 
         return {
@@ -35,6 +34,7 @@ def generate_review(
         }
 
     except ValueError as e:
+
         raise HTTPException(
             status_code=404,
             detail=str(e),
