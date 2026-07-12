@@ -3,6 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { ThemeContextProvider } from '@/components/theme-context'
 import './globals.css'
+import { Toaster } from "sonner";
+import QueryProvider from '@/providers/QueryProvider'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
 const geistMono = Geist_Mono({
@@ -50,7 +52,10 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark bg-background`}>
       <body className="font-sans antialiased bg-background">
         <ThemeContextProvider>
+          <QueryProvider>
           {children}
+          </QueryProvider>
+          <Toaster richColors />
         </ThemeContextProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

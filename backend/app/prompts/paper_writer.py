@@ -30,4 +30,20 @@ Never invent citations.
 
 At the end of the generated section,
 include a References section listing only the cited papers.
+
+If a retrieved paper is used,
+place the citation immediately after the sentence.
+
+Example:
+
+Transformers have achieved state-of-the-art performance. [1]
+
+Do not place all citations only at the end.
+
+Only cite papers listed under Retrieved References.
+
+Never fabricate references.
+
+If no retrieved paper is used,
+do not create a References section.
 """

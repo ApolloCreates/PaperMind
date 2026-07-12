@@ -27,7 +27,11 @@ class PaperWriterAgent:
             authors = reference.get("authors")
 
             if isinstance(authors, list):
-                authors = ", ".join(authors)
+
+                if len(authors) > 3:
+                    authors = ", ".join(authors[:3]) + " et al."
+                else:
+                    authors = ", ".join(authors)
 
             reference_text += (
                 f"[{index}] {reference['title']}\n"
