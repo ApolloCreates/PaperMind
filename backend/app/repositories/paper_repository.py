@@ -93,3 +93,26 @@ class PaperRepository:
         )
 
         return db.execute(stmt).scalars().all()
+    
+    def count_by_project(
+        self,
+        db: Session,
+        project_id: str,
+    ) -> int:
+
+        return (
+            db.query(Paper)
+            .filter(Paper.project_id == project_id)
+            .count()
+        )
+        
+        
+    def count(
+        self,
+        db: Session,
+    ) -> int:
+
+        return (
+            db.query(Paper)
+            .count()
+        )

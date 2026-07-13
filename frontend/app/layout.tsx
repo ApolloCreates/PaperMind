@@ -54,8 +54,8 @@ export default function RootLayout({
         <ThemeContextProvider>
           <QueryProvider>
           {children}
-          </QueryProvider>
           <Toaster richColors />
+          </QueryProvider>
         </ThemeContextProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

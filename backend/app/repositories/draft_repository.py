@@ -53,3 +53,26 @@ class DraftRepository:
 
         db.delete(draft)
         db.commit()
+        
+        
+    def count_by_project(
+        self,
+        db: Session,
+        project_id: str,
+    ) -> int:
+
+        return (
+            db.query(Draft)
+            .filter(Draft.project_id == project_id)
+            .count()
+        )
+        
+    def count(
+        self,
+        db: Session,
+    ) -> int:
+
+        return (
+            db.query(Draft)
+            .count()
+        )

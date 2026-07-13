@@ -54,3 +54,14 @@ class ProjectRepository:
 
         db.delete(project)
         db.commit()
+        
+        
+    def count(
+        self,
+        db: Session,
+    ) -> int:
+
+        return (
+            db.query(Project)
+            .count()
+        )
