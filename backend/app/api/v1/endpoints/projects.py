@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.schemas.project import ProjectCreate, ProjectResponse
+from app.schemas.project import ProjectCreate, ProjectResponse, ProjectListResponse
 from app.services.project_service import ProjectService
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
@@ -28,7 +28,7 @@ def create_project(
 
 @router.get(
     "",
-    response_model=list[ProjectResponse],
+    response_model=list[ProjectListResponse],
 )
 def list_projects(
     db: Session = Depends(get_db),

@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.schemas.paper import PaperResponse
 from app.services.paper_service import PaperService
+from fastapi.responses import StreamingResponse
 
 router = APIRouter(
     prefix="/papers",
@@ -94,3 +95,13 @@ def delete_paper(
         "message": "Deleted"
     }
 
+
+@router.get("/{paper_id}/download")
+def download_paper(
+    paper_id: str,
+    db: Session = Depends(get_db),
+):
+    return service.download(
+        db,
+        paper_id,
+    )

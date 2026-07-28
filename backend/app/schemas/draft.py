@@ -37,3 +37,13 @@ class DraftResponse(BaseModel):
 
 class DraftDetailResponse(DraftResponse):
     sections: list[DraftSectionResponse]
+
+class FullPaperResponse(BaseModel):
+    id: str
+    project_id: str
+    title: str
+    topic: str
+    content: str
+    
+class UpdateFullPaperRequest(BaseModel):
+    content: str

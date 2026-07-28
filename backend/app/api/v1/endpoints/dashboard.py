@@ -9,6 +9,9 @@ from app.schemas.dashboard import DashboardProjectsResponse
 
 from app.schemas.dashboard import DashboardStatsResponse
 
+from app.schemas.dashboard import (
+    ProjectOverviewResponse,
+)
 
 router = APIRouter(
     prefix="/dashboard",
@@ -39,3 +42,18 @@ def get_stats(
 ):
 
     return service.get_stats(db)
+
+
+@router.get(
+    "/project/{project_id}",
+    response_model=ProjectOverviewResponse,
+)
+def get_project(
+    project_id: str,
+    db: Session = Depends(get_db),
+):
+
+    return service.get_project(
+        db,
+        project_id,
+    )

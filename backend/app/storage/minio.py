@@ -4,6 +4,8 @@ from uuid import uuid4
 from minio import Minio
 
 from app.core.config import settings
+from fastapi.responses import StreamingResponse
+
 
 BUCKET_NAME = "papers"
 
@@ -39,3 +41,23 @@ class MinIOStorage:
         )
 
         return object_name
+    
+    
+
+    def download_pdf(
+        self,
+        object_name: str,
+        filename: str,
+    ):
+        response = self.client.get_object(
+            self.bucket_name,
+            object_name,
+        )
+
+        return StreamingResponse(
+            BytesIO(response.read()),
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"'
+            },
+        )

@@ -5,6 +5,12 @@ from app.repositories.paper_repository import PaperRepository
 from app.repositories.draft_repository import DraftRepository
 
 
+from app.core.project_metrics import (
+    calculate_progress,
+    calculate_status,
+)
+
+
 class DashboardService:
 
     def __init__(self):
@@ -38,28 +44,17 @@ class DashboardService:
 
             review_count = 0
 
-            progress = 0
+            progress = calculate_progress(
+                paper_count,
+                draft_count,
+                review_count,
+            )
 
-            if paper_count > 0:
-                progress += 40
-
-            if draft_count > 0:
-                progress += 40
-
-            if review_count > 0:
-                progress += 20
-
-            if paper_count == 0:
-                status = "NEW"
-
-            elif draft_count == 0:
-                status = "RESEARCH"
-
-            elif review_count == 0:
-                status = "WRITING"
-
-            else:
-                status = "READY"
+            status = calculate_status(
+                paper_count,
+                draft_count,
+                review_count,
+            )
 
             result.append(
                 {
@@ -87,4 +82,68 @@ class DashboardService:
             "total_papers": self.paper_repo.count(db),
             "total_drafts": self.draft_repo.count(db),
             "total_reviews": 0,
+        }
+        
+    def get_project(
+        self,
+        db: Session,
+        project_id: str,
+    ):
+
+        project = self.project_repo.get(
+            db,
+            project_id,
+        )
+
+        if project is None:
+            raise ValueError(
+                "Project not found."
+            )
+
+        papers = self.paper_repo.count_by_project(
+            db,
+            project.id,
+        )
+
+        drafts = self.draft_repo.count_by_project(
+            db,
+            project.id,
+        )
+
+        reviews = 0
+
+        progress = 0
+
+        if papers > 0:
+            progress += 40
+
+        if drafts > 0:
+            progress += 40
+
+        if reviews > 0:
+            progress += 20
+
+        if papers == 0:
+            status = "NEW"
+
+        elif drafts == 0:
+            status = "RESEARCH"
+
+        elif reviews == 0:
+            status = "WRITING"
+
+        else:
+            status = "READY"
+
+        return {
+            "id": project.id,
+            "name": project.name,
+            "description": project.description,
+            "papers": papers,
+            "drafts": drafts,
+            "reviews": reviews,
+            "progress": progress,
+            "status": status,
+            "created_at": project.created_at,
+            "updated_at": project.updated_at,
         }

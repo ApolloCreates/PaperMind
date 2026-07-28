@@ -1,10 +1,8 @@
-from fastapi import (
-    APIRouter,
-    File,
-    UploadFile,
-)
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
-from app.schemas.summary import SummaryResponse
+from app.db.session import get_db
+from app.schemas.summary import SummaryRequest, SummaryResponse
 from app.services.summary_service import SummaryService
 
 router = APIRouter(
@@ -19,16 +17,22 @@ service = SummaryService()
     "",
     response_model=SummaryResponse,
 )
-async def summarize(
-    file: UploadFile = File(...),
+def summarize(
+    request: SummaryRequest,
+    db: Session = Depends(get_db),
 ):
+    try:
+        summary = service.summarize(
+            db,
+            request.paper_id,
+        )
 
-    pdf = await file.read()
+        return {
+            "summary": summary,
+        }
 
-    summary = service.summarize_pdf(
-        pdf,
-    )
-
-    return {
-        "summary": summary,
-    }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e),
+        )

@@ -9,6 +9,8 @@ from app.schemas.draft import (
     DraftResponse,
     DraftSectionRequest,
     DraftSectionResponse,
+    FullPaperResponse,
+    UpdateFullPaperRequest,
 )
 
 from app.services.draft_service import DraftService
@@ -114,6 +116,55 @@ def delete(
         return {
             "message": "Draft deleted successfully."
         }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=404,
+            detail=str(e),
+        )
+        
+        
+@router.get(
+    "/{draft_id}/paper",
+    response_model=FullPaperResponse,
+)
+def get_full_paper(
+    draft_id: str,
+    db: Session = Depends(get_db),
+):
+    try:
+
+        return service.get_full_paper(
+            db,
+            draft_id,
+        )
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=404,
+            detail=str(e),
+        )
+        
+        
+@router.put(
+    "/{draft_id}/paper",
+    response_model=FullPaperResponse,
+)
+def update_full_paper(
+    draft_id: str,
+    request: UpdateFullPaperRequest,
+    db: Session = Depends(get_db),
+):
+
+    try:
+
+        return service.update_full_paper(
+            db,
+            draft_id,
+            request.content,
+        )
 
     except ValueError as e:
 

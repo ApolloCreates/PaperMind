@@ -132,3 +132,23 @@ class PaperService:
             db,
             paper,
         )
+        
+    def download(
+        self,
+        db: Session,
+        paper_id: str,
+    ):
+        paper = self.repo.get(
+            db,
+            paper_id,
+        )
+
+        if paper is None:
+            raise ValueError(
+                "Paper not found."
+            )
+
+        return self.storage.download_pdf(
+            paper.storage_path,
+            paper.original_filename,
+        )
