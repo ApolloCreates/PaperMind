@@ -54,7 +54,7 @@ Additional Instructions
 
 Existing Draft
 
-{draft_context}
+{draft_context or "No previous sections have been written yet."}
 
 Research Context
 
@@ -62,8 +62,18 @@ Research Context
 
 Retrieved References
 
-{reference_text}
+{reference_text or "No reference metadata available."}
+
+Writing Requirements
+
+- Generate only the requested section.
+- Use the research context as the primary factual basis.
+- Do not invent studies, results, datasets, citations, or numerical findings.
+- Maintain consistency with the existing draft.
+- Avoid repeating material unnecessarily from previous sections.
+- Write in an academic research-paper style.
 """
+
 
         return self.llm.generate(
             system_prompt=SYSTEM_PROMPT,

@@ -32,10 +32,12 @@ def create(
     db: Session = Depends(get_db),
 ):
     return service.create(
-        db,
-        request.project_id,
-        request.title,
-        request.topic,
+        db=db,
+        project_id=request.project_id,
+        title=request.title,
+        topic=request.topic,
+        paper_ids=request.paper_ids,
+        instructions=request.instructions,
     )
 
 

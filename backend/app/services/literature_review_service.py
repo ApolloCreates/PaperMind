@@ -19,7 +19,7 @@ class LiteratureReviewService:
         context = self.retrieval.retrieve_for_project(
             project_id=project_id,
             query=query,
-            limit=12,
+            limit=5,
         )
 
         if not context:

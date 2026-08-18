@@ -28,6 +28,7 @@ def generate(
 
         result = service.generate(
             request.project_id,
+            request.paper_ids,
             request.research_area,
         )
 
@@ -40,4 +41,4 @@ def generate(
         raise HTTPException(
             status_code=404,
             detail=str(e),
-        )
+        )  

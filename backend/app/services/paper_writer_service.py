@@ -30,6 +30,10 @@ class PaperWriterService:
         instructions: str | None,
     ) -> DraftSection:
 
+        # --------------------------------------------------
+        # 1. Get draft
+        # --------------------------------------------------
+
         draft = self.draft_repo.get(
             db,
             draft_id,
@@ -42,37 +46,76 @@ class PaperWriterService:
 
         topic = draft.topic
 
+        # --------------------------------------------------
+        # 2. Use stored draft instructions
+        #
+        # Request instructions override stored instructions
+        # if provided.
+        # --------------------------------------------------
+
+        final_instructions = (
+            instructions
+            if instructions and instructions.strip()
+            else draft.instructions
+        )
+
+        # --------------------------------------------------
+        # 3. Get previous sections
+        # --------------------------------------------------
+
         previous_sections = self.section_repo.list_sections(
             db,
             draft_id,
         )
 
-        draft_context = ""
+        draft_context_parts = []
 
         for item in previous_sections:
 
             if item.section == section:
                 continue
 
-            draft_context += (
+            if not item.content.strip():
+                continue
+
+            draft_context_parts.append(
                 f"# {item.section.value}\n\n"
                 f"{item.content}\n\n"
             )
 
-        retrieval = self.retrieval.retrieve_with_references(
-            project_id=draft.project_id,
-            query=f"{topic} {section.value}",
-            limit=8,
+        draft_context = "".join(
+            draft_context_parts
+        )
+
+        # --------------------------------------------------
+        # 4. Retrieve ONLY selected papers
+        # --------------------------------------------------
+
+        if not draft.paper_ids:
+            raise ValueError(
+                "No papers are associated with this draft."
+            )
+
+        retrieval = (
+            self.retrieval
+            .retrieve_multiple_papers_with_references(
+                paper_ids=draft.paper_ids,
+                query=f"{topic} {section.value}",
+                chunks_per_paper=3,
+            )
         )
 
         context = retrieval["context"]
-
         references = retrieval["references"]
 
         if not context:
             raise ValueError(
-                "No relevant papers found."
+                "No relevant content found in the selected papers."
             )
+
+        # --------------------------------------------------
+        # 5. Generate section
+        # --------------------------------------------------
 
         generated = self.agent.generate(
             context=context,
@@ -80,8 +123,12 @@ class PaperWriterService:
             draft_context=draft_context,
             topic=topic,
             section=section.value,
-            instructions=instructions,
+            instructions=final_instructions,
         )
+
+        # --------------------------------------------------
+        # 6. Save generated section
+        # --------------------------------------------------
 
         saved = self.section_repo.save_section(
             db=db,

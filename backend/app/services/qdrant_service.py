@@ -113,3 +113,31 @@ class QdrantService:
         )
 
         return results.points
+    
+    def search_multiple_papers(
+        self,
+        embedding: list[float],
+        paper_ids: list[str],
+        limit_per_paper: int = 2,
+    ):
+
+        all_results = []
+
+        for paper_id in paper_ids:
+            results = self.client.query_points(
+                collection_name=self.COLLECTION,
+                query=embedding,
+                query_filter=Filter(
+                    must=[
+                        FieldCondition(
+                            key="paper_id",
+                            match=MatchValue(value=paper_id),
+                        )
+                    ]
+                ),
+                limit=limit_per_paper,
+            )
+
+            all_results.extend(results.points)
+
+        return all_results

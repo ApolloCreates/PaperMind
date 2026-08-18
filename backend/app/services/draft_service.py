@@ -23,12 +23,16 @@ class DraftService:
         project_id: str,
         title: str,
         topic: str,
+        paper_ids: list[str],
+        instructions: str | None,
     ):
 
         draft = Draft(
             project_id=project_id,
             title=title,
             topic=topic,
+            paper_ids=paper_ids,
+            instructions=instructions,
         )
 
         return self.repo.create(
@@ -77,6 +81,8 @@ class DraftService:
             "project_id": draft.project_id,
             "title": draft.title,
             "topic": draft.topic,
+            "paper_ids": draft.paper_ids,
+            "instructions": draft.instructions,
             "created_at": draft.created_at,
             "updated_at": draft.updated_at,
             "sections": sections,
@@ -166,6 +172,8 @@ class DraftService:
             "project_id": draft.project_id,
             "title": draft.title,
             "topic": draft.topic,
+            "paper_ids": draft.paper_ids,
+            "instructions": draft.instructions,
             "content": build_full_paper(
                 draft.title,
                 draft.topic,

@@ -1,9 +1,5 @@
-from app.agents.topic_generation_agent import (
-    TopicGenerationAgent,
-)
-from app.services.retrieval_service import (
-    RetrievalService,
-)
+from app.agents.topic_generation_agent import TopicGenerationAgent
+from app.services.retrieval_service import RetrievalService
 
 
 class TopicGenerationService:
@@ -15,19 +11,21 @@ class TopicGenerationService:
     def generate(
         self,
         project_id: str,
+        paper_ids: list[str],
         research_area: str,
     ) -> str:
 
-        context = self.retrieval.retrieve_for_project(
-            project_id=project_id,
+        if not paper_ids:
+            raise ValueError("Please select at least one paper.")
+
+        context = self.retrieval.retrieve_multiple_papers(
+            paper_ids=paper_ids,
             query=research_area,
-            limit=8,
+            chunks_per_paper=2,
         )
 
         if not context:
-            raise ValueError(
-                "No relevant papers found."
-            )
+            raise ValueError("No relevant papers found.")
 
         return self.agent.generate(
             context=context,

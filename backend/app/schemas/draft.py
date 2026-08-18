@@ -1,13 +1,19 @@
 from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
 
 from app.models.draft_section import DraftSectionType
+
+from pydantic import Field
+
 
 
 class CreateDraftRequest(BaseModel):
     project_id: str
     title: str
     topic: str
+    paper_ids: list[str] = Field(default_factory=list)
+    instructions: str | None = None
 
 
 class DraftSectionRequest(BaseModel):
@@ -31,6 +37,8 @@ class DraftResponse(BaseModel):
     project_id: str
     title: str
     topic: str
+    paper_ids: list[str]
+    instructions: str | None
     created_at: datetime
     updated_at: datetime
 
@@ -38,12 +46,14 @@ class DraftResponse(BaseModel):
 class DraftDetailResponse(DraftResponse):
     sections: list[DraftSectionResponse]
 
+
 class FullPaperResponse(BaseModel):
     id: str
     project_id: str
     title: str
     topic: str
     content: str
-    
+
+
 class UpdateFullPaperRequest(BaseModel):
     content: str

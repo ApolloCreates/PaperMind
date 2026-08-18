@@ -5,7 +5,7 @@ from app.core.config import settings
 
 class LLMService:
 
-    DEFAULT_MODEL = "groq/llama-3.1-8b-instant"
+    DEFAULT_MODEL = "groq/openai/gpt-oss-120b"
 
     def generate(
         self,
